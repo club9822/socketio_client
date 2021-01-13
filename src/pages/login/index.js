@@ -11,11 +11,12 @@ function Page(props) {
   console.log(process.env)
   let history = useHistory();
 
-  const onLogin=(username)=>{
+  const onLogin=(username,userId)=>{
     return new Promise((resolve, reject) => {
     const {socketRef}=props
      socketRef.current=SocketUtil.init(username);
      setCookie('username',username)
+     setCookie('userId',userId)
       console.log(socketRef)
       setTimeout(()=>{
         resolve(true)
@@ -43,7 +44,7 @@ function Page(props) {
             }
           }).then(res=>{
             console.log(res.data)
-            onLogin(res.data.username).then(r=>{
+            onLogin(res.data.username,res.data.id).then(r=>{
               history.push("/");
             })
             // history.push("/");

@@ -8,10 +8,7 @@ const SOCKET_SERVER_URL = 'http://localhost:4000';
 // console.log(process.env)
 const useChat = (roomId,socketRef) => {
   const [messages, setMessages] = useState([]); // Sent and received messages
-  useEffect(()=>{
-    socketRef.current.emit('joinRoom',{roomId:roomId,userId:socketRef?.current?.id+''},(e)=>{
-    })
-  },[roomId])
+
   useEffect(() => {
     // Creates a WebSocket connection
     // socketRef.current = socketIOClient(SOCKET_SERVER_URL, {
@@ -39,18 +36,7 @@ const useChat = (roomId,socketRef) => {
   // Sends a message to the server that
   // forwards it to all users in the same room
   const sendMessage = (messageBody) => {
-    if(messageBody && typeof messageBody ==='string' && messageBody.length>0){
-      try{
-        socketRef.current.emit(NEW_CHAT_MESSAGE_EVENT,roomId, {
-          body: messageBody,
-          userId: socketRef.current.id,
-          roomId:roomId
-        });
-        sendMessageToApi(messageBody)
-      }catch (e){
-        console.log('log::::sendMessage',e)
-      }
-    }
+
   };
   const sendMessageToApi=(messageBody)=>{
     axios({

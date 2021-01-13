@@ -21,19 +21,33 @@ function Page(props) {
     setRoomName(event.target.value);
   };
   const getAllUsers= ()=>{
-    socketRef?.current.emit('allSockets',(sockets)=>{
-      alert(JSON.stringify(sockets))
-      console.log(sockets)
-      setNewUser(sockets)
+    socketRef.current?.emit('allSockets',(err,sockets)=>{
+      // alert(JSON.stringify(sockets))
+      console.log('allSockets:',err,sockets)
+      if(sockets&&Array.isArray(sockets)) {
+        setAllUsers(sockets)
+      }
+    })
+  }
+  const getAllRooms= ()=>{
+    socketRef.current?.emit('allRooms',(err,sockets)=>{
+      // alert(JSON.stringify(sockets))
+      console.log('getAllRooms',err,sockets)
+      if(sockets&&Array.isArray(sockets)){
+        setRooms(sockets)
+      }
+
     })
   }
   useEffect(()=>{
-    console.log(socketRef.current)
-    if(socketRef && socketRef.current){
-      console.log(socketRef.current)
-       socketRef?.current.emit('allRooms',(e,rooms)=>{
-         setRooms(rooms)
-       })
+    if(socketRef){
+      console.log('socketRef.current',socketRef)
+      getAllRooms()
+      socketRef.current?.on('join',(e)=>{
+        alert('join')
+        getAllUsers()
+        getAllRooms()
+      })
       //  socketRef?.current.on('connect',(msg)=>{
       //    console.log(msg)
       //    setNewUser(msg)
@@ -44,21 +58,24 @@ function Page(props) {
       getAllUsers()
 
     }
-  },[socketRef])
-  const joinToGroup=()=>{
-
+  },[socketRef,socketRef.current])
+  const joinToGroup=(roomId,username)=>{
+    socketRef.current.emit('joinRoom',{roomId:roomId,username:username,socketId:String(socketRef?.current?.id)},(e)=>{
+    })
+  }
+  const getAllGroups= async ()=>{
+    try{
+      const response= await axios({method:'get',url:'db/group',})
+      console.log(response)
+      setGroups(response.data)
+    }catch (e){
+      console.log(e)
+    }
   }
   useEffect(()=>{
     getAllGroups()
   },[])
-  const getAllGroups= async ()=>{
-    try{
-      const response= await axios({method:'get',url:'db/group'})
-      setGroups(response.data)
-    }catch (e){
 
-    }
-  }
   useEffect(()=>{
     const username= getCookie('username')
     if(username){
@@ -67,8 +84,12 @@ function Page(props) {
       history.push('/login')
     }
   },[])
+
   return (
     <div>
+      <h1>
+        {getCookie('username')||''}
+      </h1>
       <p>
         all rooms : include users
       </p>
@@ -96,11 +117,11 @@ function Page(props) {
       </p>
       <div style={{flexDirection:'column',display:'flex'}}>
         {
-          groups.map(group=>{
+          groups&&Array.isArray(groups)?groups.map(group=>{
             return (<Link to={{pathname:`/${group?.id}`,search:'?userId=x'}} className="enter-room-button" key={group.id} onClick={()=>{
 
             }}> {group.name||''}</Link>)
-          })
+          }):null
         }
       </div>
       <div style={{position:'absolute',right:0,top:0,backgroundColor:'#e1f1ed',flexDirection:'column',display:'flex'}}>
@@ -109,7 +130,7 @@ function Page(props) {
           {newUser?newUser?.message:''}
         </div>
         {
-          allUsers.map(user=>(<Link key={user+'_'} to={{pathname:`/pv/${user}`,search:'?userId=sss'}} className="enter-room-button">
+          allUsers.map(user=>(<Link key={user+'_'} to={{pathname:`/${user}`,search:'?userId=sss'}} className="enter-room-button">
             {user||''}
           </Link>))
         }
