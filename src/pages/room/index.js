@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import useChat from "./useChat";
 import { Link, withRouter } from "react-router-dom";
 import { getCookie, setCookie } from "../../utils/cookie";
 import "react-chat-elements/dist/main.css";
