@@ -1,8 +1,8 @@
-import {io} from "socket.io-client";
+import { io } from "socket.io-client";
 
 export class SocketUtil {
-  static init(username){
-    return io(process.env.REACT_APP_SOCKET_SERVER_URL,{
+  static init(username) {
+    return io(process.env.REACT_APP_SOCKET_SERVER_URL || "", {
       // path: '/',
       reconnection: true,
       reconnectionAttempts: Infinity,
@@ -19,9 +19,9 @@ export class SocketUtil {
       forceBase64: false,
       enablesXDR: false,
       timestampRequests: true,
-      timestampParam: 't',
+      timestampParam: "t",
       policyPort: 843,
-      transports: ['polling', 'websocket'],
+      transports: ["polling", "websocket"],
       transportOptions: {},
       rememberUpgrade: false,
       onlyBinaryUpgrades: false,
@@ -41,8 +41,8 @@ export class SocketUtil {
       localAddress: null,
       // options for Node.js / React Native
       extraHeaders: {
-        username:username
+        username: username,
       },
-    })
+    });
   }
 }
